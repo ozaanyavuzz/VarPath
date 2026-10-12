@@ -1,0 +1,43 @@
+# --- Data (competition files are not redistributable) ---
+data/
+*.zip
+YARISMA_*.csv
+YARISMA_*
+*TRAIN*SETLER*/
+!examples/synthetic_sample.csv
+
+# --- Run outputs and model artifacts ---
+outputs/*
+!outputs/.gitkeep
+artifacts/
+runs/
+*.pdf
+predictions*.csv
+submission.csv
+mlruns/
+*.joblib
+*.ubj
+*.pt
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Gradio ---
+.gradio/
+flagged/

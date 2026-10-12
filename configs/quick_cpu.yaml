@@ -1,0 +1,159 @@
+# CPU-only profile actually used for the run reported in the README.
+# It is the quick profile with a further reduced transformer budget so that a
+# complete nested run fits in ~13 minutes on a single CPU core:
+#   ft.max_epochs 15 -> 8, ft.patience 4 -> 3, ft.token_budget 128 -> 96,
+#   preprocessing.imputer_max_iter 5 -> 3, compute.n_jobs 1, torch_threads 1.
+# Reproduce with:
+#   python scripts/train.py --config configs/quick_cpu.yaml --data-dir data
+profile: quick-cpu
+seed: 42
+output_dir: outputs/quick-cpu
+artifacts_dir: artifacts/quick-cpu
+data:
+  data_dir: data
+  panel_files:
+    master: YARISMA_TRAIN_MASTER.csv
+    kanser: YARISMA_TRAIN_KANSER.csv
+    pah: YARISMA_TRAIN_PAH.csv
+    cftr: YARISMA_TRAIN_CFTR.csv
+  label_column: Label
+  id_column: Variant_ID
+  aa_ref_column: AA_1
+  aa_alt_column: AA_2
+  panel_column: panel
+  categorical_prefix: CAT_
+  exclude_columns: []
+grouping:
+  strategy: column
+  column: Variant_ID
+  entity_level: variant
+  row_hash_decimals: 3
+  row_hash_buckets: null
+cv:
+  outer_folds: 3
+  inner_folds: 2
+  stratify_by:
+  - label
+  - panel
+  early_stopping_fraction: 0.15
+preprocessing:
+  numeric_parse_min_ratio: 0.3
+  drop_constant_numeric: true
+  imputer_max_iter: 3
+  imputer_n_nearest_features: 20
+  imputer_sample_posterior: false
+  ohe_min_frequency: 3
+  missing_mi_threshold: 0.001
+  missing_mi_discrete: false
+  drop_conflicts: true
+  conflict_decimals: 3
+  tda_enabled: true
+  tda_n_points: 50
+  tda_missing_strategy: train_median
+  float32: true
+xgb:
+  n_trials: 5
+  pruning: true
+  pos_weight_multiplier: 1.5
+  n_estimators:
+  - 100
+  - 400
+  learning_rate:
+  - 0.01
+  - 0.1
+  max_depth_min: 3
+  num_leaves:
+  - 15
+  - 127
+  subsample:
+  - 0.6
+  - 1.0
+  colsample_bytree:
+  - 0.6
+  - 1.0
+  reg_alpha:
+  - 0.1
+  - 50.0
+  reg_lambda:
+  - 0.1
+  - 50.0
+  early_stopping_rounds: 30
+  depth_cap_panel: cftr
+  depth_cap_min_fraction: 0.01
+  depth_cap_value: 3
+lgb:
+  n_trials: 5
+  pruning: true
+  pos_weight_multiplier: 1.5
+  n_estimators:
+  - 100
+  - 400
+  learning_rate:
+  - 0.01
+  - 0.1
+  max_depth_min: 3
+  num_leaves:
+  - 15
+  - 127
+  subsample:
+  - 0.6
+  - 1.0
+  colsample_bytree:
+  - 0.6
+  - 1.0
+  reg_alpha:
+  - 0.1
+  - 50.0
+  reg_lambda:
+  - 0.1
+  - 50.0
+  early_stopping_rounds: 30
+  depth_cap_panel: cftr
+  depth_cap_min_fraction: 0.01
+  depth_cap_value: 3
+ft:
+  d_token: 32
+  n_heads: 4
+  n_layers: 2
+  dropout: 0.3
+  max_epochs: 8
+  patience: 3
+  batch_size: 128
+  eval_batch_size: 512
+  lr: 0.0003
+  weight_decay: 0.0001
+  mtl_alpha: 0.7
+  label_smoothing: 0.1
+  grad_clip: 1.0
+  pos_weight_multiplier: 1.5
+  token_budget: 96
+  amp: true
+stacking:
+  C: 1.0
+  max_iter: 500
+  fit_calibrator: true
+threshold:
+  beta: 2.0
+  min_specificity: 0.6
+  default: 0.5
+evaluation:
+  bootstrap_iterations: 200
+  bootstrap_unit: group
+  ci_alpha: 0.05
+  panel_min_n: 5
+  panel_exploratory_n: 30
+  calibration_bins: 10
+  dca_min: 0.01
+  dca_max: 0.8
+  dca_points: 80
+  panel_finetune: false
+  variant_network: true
+shap:
+  enabled: true
+  n_samples: 100
+  max_display: 20
+compute:
+  n_jobs: 1
+  device: cpu
+  torch_threads: 1
+  cache_tda: true

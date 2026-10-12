@@ -1,0 +1,50 @@
+# Quick profile: development and CPU sanity runs (no GPU required).
+# Reduced search budget and a transformer token budget; results from this
+# profile are labelled "quick" and are not the repository's reference estimate.
+profile: quick
+seed: 42
+output_dir: outputs/quick
+artifacts_dir: artifacts/quick
+
+grouping:
+  strategy: column
+  column: Variant_ID
+  entity_level: variant
+
+cv:
+  outer_folds: 3
+  inner_folds: 2
+  stratify_by: [label, panel]
+  early_stopping_fraction: 0.15
+
+preprocessing:
+  imputer_max_iter: 5
+  imputer_n_nearest_features: 20
+
+xgb:
+  n_trials: 5
+  n_estimators: [100, 400]
+
+lgb:
+  n_trials: 5
+  n_estimators: [100, 400]
+
+ft:
+  d_token: 32
+  n_heads: 4
+  n_layers: 2
+  max_epochs: 15
+  patience: 4
+  batch_size: 128
+  token_budget: 128
+
+evaluation:
+  bootstrap_iterations: 200
+  panel_finetune: false
+
+shap:
+  n_samples: 100
+
+compute:
+  n_jobs: 1
+  device: auto

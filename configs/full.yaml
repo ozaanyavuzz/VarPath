@@ -1,0 +1,46 @@
+# Full profile: maximum-budget research run, close to the original
+# competition settings (25 Optuna trials, 50 FT epochs, d_token=64).
+profile: full
+seed: 42
+output_dir: outputs/full
+artifacts_dir: artifacts/full
+
+grouping:
+  strategy: column
+  column: Variant_ID
+  entity_level: variant
+
+cv:
+  outer_folds: 5
+  inner_folds: 5
+  stratify_by: [label, panel]
+
+preprocessing:
+  imputer_max_iter: 7
+  imputer_n_nearest_features: 20
+
+xgb:
+  n_trials: 25
+
+lgb:
+  n_trials: 25
+
+ft:
+  d_token: 64
+  n_heads: 4
+  n_layers: 2
+  max_epochs: 50
+  patience: 10
+  batch_size: 64
+  token_budget: null
+
+evaluation:
+  bootstrap_iterations: 2000
+  panel_finetune: true
+
+shap:
+  n_samples: 500
+
+compute:
+  n_jobs: -1
+  device: auto

@@ -1,0 +1,27 @@
+# Sensitivity analysis only: groups rows by duplicate numeric profile, as in
+# the competition prototype. This is NOT a gene- or variant-held-out evaluation.
+profile: sensitivity_row_hash
+seed: 42
+output_dir: outputs/sensitivity_row_hash
+artifacts_dir: artifacts/sensitivity_row_hash
+
+grouping:
+  strategy: row_hash
+  row_hash_decimals: 3
+  row_hash_buckets: 200
+
+cv:
+  outer_folds: 3
+  inner_folds: 2
+
+xgb:
+  n_trials: 5
+lgb:
+  n_trials: 5
+ft:
+  max_epochs: 15
+  patience: 4
+  token_budget: 128
+evaluation:
+  bootstrap_iterations: 200
+  panel_finetune: false

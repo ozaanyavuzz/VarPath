@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "varpath"
+version = "0.2.0"
+description = "Missense variant pathogenicity classification with leakage-controlled nested group-aware cross-validation (TEKNOFEST 2026 Healthcare AI project)."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scipy>=1.10",
+    "scikit-learn>=1.4",
+    "xgboost>=2.0",
+    "lightgbm>=4.0",
+    "torch>=2.1",
+    "optuna>=3.4",
+    "shap>=0.44",
+    "ripser>=0.6.4",
+    "networkx>=3.0",
+    "matplotlib>=3.7",
+    "fpdf2>=2.7",
+    "pyyaml>=6.0",
+    "joblib>=1.3",
+]
+
+[project.optional-dependencies]
+app = ["gradio>=4.0"]
+dev = ["pytest>=7.4", "ruff>=0.4"]
+
+[project.scripts]
+varpath-train = "varpath.cli:train_main"
+varpath-evaluate = "varpath.cli:evaluate_main"
+varpath-predict = "varpath.cli:predict_main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::FutureWarning",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501", "B905", "UP007"]

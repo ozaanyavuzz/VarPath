@@ -1,0 +1,85 @@
+# Standard profile: the reference scientific run of this repository.
+# 5 outer x 3 inner group-aware folds. A single consumer GPU is recommended
+# for the FT-Transformer (all engineered features are used as tokens);
+# CPU-only runs work but are slow.
+profile: standard
+seed: 42
+output_dir: outputs/standard
+artifacts_dir: artifacts/standard
+
+data:
+  data_dir: data
+  panel_files:
+    master: YARISMA_TRAIN_MASTER.csv
+    kanser: YARISMA_TRAIN_KANSER.csv
+    pah: YARISMA_TRAIN_PAH.csv
+    cftr: YARISMA_TRAIN_CFTR.csv
+  label_column: Label
+  id_column: Variant_ID
+  aa_ref_column: AA_1
+  aa_alt_column: AA_2
+  categorical_prefix: CAT_
+
+grouping:
+  # The competition files contain no gene/protein/transcript identifier.
+  # Variant_ID links the same variant across panel files, so grouping on it
+  # prevents a variant from appearing on both sides of a split. This is a
+  # variant-level (not gene-level) held-out evaluation.
+  strategy: column
+  column: Variant_ID
+  entity_level: variant
+
+cv:
+  outer_folds: 5
+  inner_folds: 3
+  stratify_by: [label, panel]
+  early_stopping_fraction: 0.15
+
+preprocessing:
+  imputer_max_iter: 7
+  imputer_n_nearest_features: 20
+  imputer_sample_posterior: false
+  ohe_min_frequency: 3
+  missing_mi_threshold: 0.001
+  drop_constant_numeric: true
+  drop_conflicts: true
+  tda_enabled: true
+  tda_n_points: 50
+  tda_missing_strategy: train_median
+
+xgb:
+  n_trials: 10
+  pruning: true
+
+lgb:
+  n_trials: 10
+  pruning: true
+  early_stopping_rounds: 30
+
+ft:
+  d_token: 32
+  n_heads: 4
+  n_layers: 2
+  dropout: 0.3
+  max_epochs: 30
+  patience: 5
+  batch_size: 128
+  lr: 0.0003
+  token_budget: null
+  amp: true
+
+threshold:
+  beta: 2.0
+  min_specificity: 0.60
+
+evaluation:
+  bootstrap_iterations: 1000
+  bootstrap_unit: group
+  panel_finetune: true
+
+shap:
+  n_samples: 300
+
+compute:
+  n_jobs: 4
+  device: auto
